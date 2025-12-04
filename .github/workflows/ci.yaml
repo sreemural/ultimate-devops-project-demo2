@@ -87,3 +87,6 @@ jobs:
           git add src/k8s/deployments/product-catalog-deployment.yaml
           git commit -m "Update product catalog deployment image tag to"
           git push
+
+
+          
