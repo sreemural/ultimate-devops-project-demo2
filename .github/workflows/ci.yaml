@@ -63,7 +63,7 @@ jobs:
           context: src/product-catalog
           file: src/product-catalog/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/product-catalog-service:${{ github.run_id }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/product-catalog:${{ github.run_id }}
       
   Updatek8s:
     runs-on: ubuntu-latest
