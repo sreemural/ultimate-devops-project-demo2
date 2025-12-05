@@ -1,10 +1,11 @@
-#CI for roduct Catalog Service
+# CI for roduct Catalog Service 
 name: Product Catalog Service CI
 
 on:
- pull_request:
+  push:
     branches:
       - main
+
 
 jobs:
   build:
@@ -20,13 +21,13 @@ jobs:
           go-version: '1.22'
       
       - name: Build
-        run: 
+        run: |
           cd src/product-catalog
           go mod download
           go build -o product-catalog-service main.go
 
       - name: unit tests
-        run: 
+        run: |
           cd src/product-catalog
           go test -v ./...
           
@@ -35,7 +36,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        run:  
+        run:  |
               go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.56.1
               golangci-lint run ./src/product-catalog/...
   
@@ -61,7 +62,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: src/product-catalog
-          file: Dockerfile
+          file: src/product-catalog/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/product-catalog-service:${{ github.run_id }}
       
@@ -78,12 +79,21 @@ jobs:
     
       - name: Update tag in k8s deployment file
         run: |
-          sed -i 's/image: .*/image: ${{ secrets.DOCKER_HUB_USERNAME }}/productcatalogservice:${{ github.run_id }}/' src/k8s/deployments/product-catalog-deployment.yaml
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_HUB_USERNAME }}/product-catalog:${{github.run_id}}|" kubernetes/productcatalog/deploy.yaml
+
         
       - name: Commit and push changes
         run: |
           git config --global user.email "sreelajavm@gmail.com"
           git config --global user.name "sreemural"
-          git add src/k8s/deployments/product-catalog-deployment.yaml
+          git add kubernetes/productcatalog/deploy.yaml
           git commit -m "Update product catalog deployment image tag to"
-          git push
+          git push origin HEAD:${{ github.ref }}
+
+       
+
+
+
+
+
+
