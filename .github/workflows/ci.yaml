@@ -78,16 +78,7 @@ jobs:
     
       - name: Update tag in k8s deployment file
         run: |
-          NEW_IMAGE="${{ secrets.DOCKER_HUB_USERNAME }}/productcatalogservice:${{ github.run_id }}"
-          FILE="src/k8s/deployments/product-catalog-deployment.yaml"
-          
-          echo "Old image:"
-          grep -E 'image:' $FILE || true
-
-          sed -i "s|^[[:space:]]*image:.*|  image: ${NEW_IMAGE}|" "$FILE"
-
-          echo "New image:"
-          grep -E 'image:' $FILE || true
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_HUB_USERNAME }}/product-catalog:${{github.run_id}}|" kubernetes/productcatalog/deploy.yaml
 
         
       - name: Commit and push changes
